@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sk\n"
+
+msgctxt "#30100"
+msgid "Account"
+msgstr "Účet"
+
+msgctxt "#30102"
+msgid "User Name"
+msgstr "Meno"
+
+msgctxt "#30103"
+msgid "Password"
+msgstr "Heslo"
+
+msgctxt "#30104"
+msgid "When no device is available use oldest"
+msgstr "Ak žiadne zariadenie nie je dostupé, použi najstaršie"
+
+msgctxt "#30120"
+msgid "Playlist"
+msgstr "Playlist"
+
+msgctxt "#30121"
+msgid "M3U"
+msgstr "M3U"
+
+msgctxt "#30123"
+msgid "Directory of playlist"
+msgstr "Adresár"
+
+msgctxt "#30124"
+msgid "File name"
+msgstr "Súbor"
+
+msgctxt "#30140"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30141"
+msgid "XMLTV"
+msgstr "XMLTV"
+
+msgctxt "#30142"
+msgid "Enabled EPG"
+msgstr "Generovať EPG"
+
+msgctxt "#30143"
+msgid "Directory of EPG file"
+msgstr "Adresár"
+
+msgctxt "#30144"
+msgid "File Name"
+msgstr "Súbor"
+
+msgctxt "#30145"
+msgid "Days"
+msgstr "Počet dni"
+
+msgctxt "#30301"
+msgid "Too many devices, select device to disconnect"
+msgstr "Prekročený počet pripojených zariadení, vyberte zariadenie ktoré má byť odpojené"
+
+msgctxt "#30501"
+msgid "User name or password is not defined"
+msgstr "Memo alebo heslo nie je nastavené"
+
+msgctxt "#30502"
+msgid "User name or password is not valid"
+msgstr "Memo alebo heslo nie je správne"
+
+msgctxt "#30503"
+msgid "Internet connection error"
+msgstr "Internetové spojenie nie je dostupné"
+
+msgctxt "#30504"
+msgid "Stream is not available!"
+msgstr "Stream nie je k dispozicii!"

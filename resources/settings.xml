@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="30100">
+        <setting label="30100" type="lsep"/>
+        <setting label="30102" type="text" id="username" default=""/>
+        <setting label="30103" type="text" id="password" option="hidden" enable="!eq(-1,)" default=""/>
+        <setting label="30391" type="action" option="close" action="RunScript(special://home/addons/plugin.iptv.magiogo/conf.py)"/>
+        <setting type="lsep"/>
+        <setting label="30104" type="bool" id="reuse_last_device" default="true"/>
+    </category>
+    <category label="30120">
+        <setting label="30121" type="lsep"/>
+        <setting label="30123" type="folder" id="playlist_folder" default=""/>
+        <setting label="30124" type="text" id="playlist_file" default="playlist.m3u"/>
+    </category>
+    <category label="30140">
+        <setting label="30141" type="lsep"/>
+        <setting label="30142" type="bool" id="epg_generate" default="true" />
+        <setting label="30143" type="folder" id="epg_folder" default="" enable="eq(-1,true)"/>
+        <setting label="30144" type="text" id="epg_file" default="epg.xml" enable="eq(-2,true)"/>
+        <setting label="30145" type="slider" id="epg_days" default="2" range="1,1,10" option="int" enable="eq(-3,true)"/>
+    </category>
+</settings>

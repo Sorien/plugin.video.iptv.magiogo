@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgctxt "#30100"
+msgid "Account"
+msgstr "Account"
+
+msgctxt "#30102"
+msgid "User Name"
+msgstr "Use Name"
+
+msgctxt "#30103"
+msgid "Password"
+msgstr "Password"
+
+msgctxt "#30104"
+msgid "When no device is available use oldest"
+msgstr "When no device is available use oldest"
+
+msgctxt "#30120"
+msgid "Playlist"
+msgstr "Playlist"
+
+msgctxt "#30121"
+msgid "M3U"
+msgstr "M3U"
+
+msgctxt "#30123"
+msgid "Directory of playlist"
+msgstr "Directory of playlist"
+
+msgctxt "#30124"
+msgid "File name"
+msgstr "File name"
+
+msgctxt "#30140"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30141"
+msgid "XMLTV"
+msgstr "XMLTV"
+
+msgctxt "#30142"
+msgid "Enabled EPG"
+msgstr "Enabled EPG"
+
+msgctxt "#30143"
+msgid "Directory of EPG file"
+msgstr "Directory of EPG file"
+
+msgctxt "#30144"
+msgid "File Name"
+msgstr "File name"
+
+msgctxt "#30145"
+msgid "Days"
+msgstr "Days"
+
+msgctxt "#30301"
+msgid "Too many devices, select device to disconnect"
+msgstr "Too many devices, select device to disconnect"
+
+msgctxt "#30501"
+msgid "User name or password is not defined"
+msgstr "User name or password is not defined"
+
+msgctxt "#30502"
+msgid "User name or password is not valid"
+msgstr "User name or password is not valid"
+
+msgctxt "#30503"
+msgid "Internet connection error"
+msgstr "Internet connection error"
+
+msgctxt "#30504"
+msgid "Stream is not available!"
+msgstr "Stream is not available!"

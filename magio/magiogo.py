@@ -1,0 +1,234 @@
+import datetime
+import random
+import time
+import requests
+
+try:
+    from typing import List
+except:
+    pass
+
+from builtins import super
+from iptv.client import IPTVClient, UserNotDefinedException, UA, Channel, StreamInfo, Programme, UserInvalidException
+
+
+class MagioGoException(Exception):
+    def __init__(self, id, text):
+        self.id = id
+        self.text = text
+
+
+class MagioGoSessionData:
+    def __init__(self):
+        self.access_token = ''
+        self.refresh_token = ''
+        self.expires_in = 0
+        self.type = ''
+
+
+class MagioDevice:
+    def __init__(self):
+        self.id = ''
+        self.name = ''
+        self.expiration_time = None
+        self.is_this = False
+
+
+class MagioGo(IPTVClient):
+
+    def __init__(self, storage_dir, user_name, password):
+        self._user_name = user_name
+        self._password = password
+        self._data = MagioGoSessionData()
+        super().__init__(storage_dir, '%s.session' % self._user_name)
+
+    def _check_response(self, resp):
+        if resp['success']:
+            if 'token' in resp:
+                self._data.access_token = resp['token']['accessToken']
+                self._data.refresh_token = resp['token']['refreshToken']
+                self._data.expires_in = resp['token']['expiresIn']
+                self._data.type = resp['token']['type']
+                self._store_session(self._data)
+        else:
+            error_code = resp['errorCode']
+            if error_code == 'INVALID_CREDENTIALS':
+                raise UserInvalidException()
+            raise MagioGoException(resp['errorCode'], resp['errorMessage'])
+
+    def _auth_headers(self):
+        return {'Authorization': self._data.type + ' ' + self._data.access_token,
+                'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache', 'Referer': 'https://www.magiogo.sk/',
+                'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site', 'User-Agent': UA}
+
+    def _login(self):
+        if (self._user_name == '') or (self._password == ''):
+            raise UserNotDefinedException
+
+        self._load_session(self._data)
+
+        if not self._data.access_token:
+            resp = requests.post('https://skgo.magio.tv/v2/auth/init',
+                                 params={'dsid': 'Netscape.' + str(int(time.time())) + '.' + str(random.random()),
+                                         'deviceName': 'Netscape',
+                                         'deviceType': 'OTT_WIN',
+                                         'osVersion': '0.0.0',
+                                         'appVersion': '0.0.0',
+                                         'language': 'SK'},
+                                 headers={'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache',
+                                          'Referer': 'https://www.magiogo.sk/', 'User-Agent': UA,
+                                          'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site'}).json()
+            self._check_response(resp)
+
+            resp = requests.post('https://skgo.magio.tv/v2/auth/login',
+                                 json={'loginOrNickname': self._user_name, 'password': self._password},
+                                 headers=self._auth_headers()).json()
+
+            self._check_response(resp)
+
+        if self._data.refresh_token and self._data.expires_in < int(time.time() * 1000):
+            resp = requests.post('https://skgo.magio.tv/v2/auth/tokens',
+                                 json={'refreshToken': self._data.refresh_token},
+                                 headers=self._auth_headers()).json()
+            self._check_response(resp)
+
+    def channels(self):
+        self._login()
+        resp = requests.get('https://skgo.magio.tv/v2/television/channels',
+                            params={'list': 'LIVE', 'queryScope': 'LIVE'},
+                            headers=self._auth_headers()).json()
+        self._check_response(resp)
+
+        ret = []
+        for i in resp['items']:
+            i = i['channel']
+            c = Channel()
+            c.id = i['channelId']
+            c.name = i['name']
+            c.logo = i['logoUrl']
+            if i['hasArchive']:
+                c.archive_days = self.archive_days()
+            ret.append(c)
+        return ret
+
+    def channel_stream_info(self, channel_id, programme_id=None):
+        self._login()
+        resp = requests.get('https://skgo.magio.tv/v2/television/stream-url',
+                            params={'service': 'LIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                                    'id': channel_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                            headers=self._auth_headers()).json()
+        self._check_response(resp)
+
+        si = StreamInfo()
+        si.url = resp['url']
+        return si
+
+    def programme_stream_info(self, programme_id):
+        self._login()
+        resp = requests.get('https://skgo.magio.tv/v2/television/stream-url',
+                            params={'service': 'ARCHIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                                    'id': programme_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                            headers=self._auth_headers()).json()
+        self._check_response(resp)
+
+        si = StreamInfo()
+        si.url = resp['url']
+        return si
+
+    @staticmethod
+    def _strptime(date_string, format):
+        # https://forum.kodi.tv/showthread.php?tid=112916 it's insane !!!
+        try:
+            return datetime.datetime.strptime(date_string, format)
+        except TypeError:
+            import time as ptime
+            return datetime.datetime(*(ptime.strptime(date_string, format)[0:6]))
+
+    def epg(self, channels, from_date, to_date):
+        self._login()
+        ret = {}
+
+        from_date = from_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        to_date = to_date.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+        now = datetime.datetime.utcnow()
+
+        for n in range(int((to_date - from_date).days)):
+            current_day = from_date + datetime.timedelta(n)
+            filter = 'startTime=ge=%sT00:00:00.000Z;startTime=le=%sT00:59:59.999Z' % (
+                current_day.strftime("%Y-%m-%d"), (current_day + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+
+            fetch_more = True
+            offset = 0
+            while fetch_more:
+                resp = requests.get('https://skgo.magio.tv/v2/television/epg',
+                                    params={'filter': filter, 'limit': '20', 'offset': offset * 20, 'list': 'LIVE'},
+                                    headers=self._auth_headers()).json()
+                self._check_response(resp)
+
+                fetch_more = len(resp['items']) == 20
+                offset = offset + 1
+
+                for i in resp['items']:
+                    for p in i['programs']:
+                        channel = str(p['channel']['id'])
+
+                        if channel not in channels:
+                            continue
+
+                        if channel not in ret:
+                            ret[channel] = []
+
+                        pi = p['program']
+
+                        programme = Programme()
+                        programme.id = pi['programId']
+                        programme.start_time = self._strptime(p['startTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                        programme.end_time = self._strptime(p['endTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                        programme.title = pi['title']
+                        programme.description = pi['description']
+                        programme.duration = p['duration']
+                        programme.is_replyable = (programme.start_time > (now - datetime.timedelta(days=7))) and (programme.end_time < now)
+
+                        pv = pi['programValue']
+                        if pv['episodeId'] is not None:
+                            programme.episodeNo = int(pv['episodeId'])
+                        if pv['seasonNumber'] is not None:
+                            programme.seasonNo = int(pv['seasonNumber'])
+                        if len(pi['images']) > 0:
+                            programme.cover = pi['images'][0]
+                        for d in pi['programRole']['directors']:
+                            programme.directors.append(d['fullName'])
+                        for a in pi['programRole']['actors']:
+                            programme.actors.append(a['fullName'])
+
+                        ret[channel].append(programme)
+        return ret
+
+    def archive_days(self):
+        return 7
+
+    def devices(self):
+        # type: () -> List[MagioDevice]
+        def make_device(i, is_this):
+            device = MagioDevice()
+            device.id = str(i['id'])
+            device.name = i['name']
+            device.expiration_time = self._strptime(i['verimatrixExpirationTime'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            device.is_this = is_this
+            return device
+
+        self._login()
+        resp = requests.get('https://skgo.magio.tv/home/listDevices', headers=self._auth_headers()).json()
+        self._check_response(resp)
+
+        devices = [make_device(i, False) for i in resp['items']]
+
+        if resp['thisDevice']:
+            devices.append(make_device(resp['thisDevice'], True))
+        return devices
+
+    def disconnect_device(self, device_id):
+        # type: (str) -> None
+        self._login()
+        resp = requests.get('https://skgo.magio.tv/home/deleteDevice', params={'id': device_id}, headers=self._auth_headers()).json()
+        self._check_response(resp)
