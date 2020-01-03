@@ -103,7 +103,7 @@ class MagioGo(IPTVClient):
         for i in resp['items']:
             i = i['channel']
             c = Channel()
-            c.id = i['channelId']
+            c.id = str(i['channelId'])
             c.name = i['name']
             c.logo = i['logoUrl']
             if i['hasArchive']:
