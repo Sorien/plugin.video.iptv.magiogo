@@ -10,13 +10,13 @@ class MagioGoService(IPTVUpdateService):
     def create_addon(self):
         return MagioGoAddon()
 
-    def fetch_channels(self):
-        return self.addon.client.channels()
+    def fetch_channels(self, progress):
+        return self.addon.client.channels(progress)
 
-    def fetch_epg(self, channels):
+    def fetch_epg(self, channels, progress):
         days = int(self.addon.getSetting('epg_days'))
         now = datetime.now()
-        return self.addon.client.epg([c.id for c in channels], now - timedelta(days=days), now + timedelta(days=days))
+        return self.addon.client.epg([c.id for c in channels], now - timedelta(days=days), now + timedelta(days=days), progress)
 
     def playlist_path(self):
         if self.addon.getSetting('playlist_folder'):

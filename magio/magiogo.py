@@ -9,7 +9,7 @@ except:
     pass
 
 from builtins import super
-from iptv.client import IPTVClient, UserNotDefinedException, UA, Channel, StreamInfo, Programme, UserInvalidException
+from iptv.client import IPTVClient, UserNotDefinedException, UA, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress
 
 
 class MagioGoException(Exception):
@@ -92,8 +92,11 @@ class MagioGo(IPTVClient):
                                  headers=self._auth_headers()).json()
             self._check_response(resp)
 
-    def channels(self):
+    def channels(self, progress=dummy_progress):
         self._login()
+
+        progress(0)
+
         resp = requests.get('https://skgo.magio.tv/v2/television/channels',
                             params={'list': 'LIVE', 'queryScope': 'LIVE'},
                             headers=self._auth_headers()).json()
@@ -109,6 +112,9 @@ class MagioGo(IPTVClient):
             if i['hasArchive']:
                 c.archive_days = self.archive_days()
             ret.append(c)
+
+        progress(100)
+
         return ret
 
     def channel_stream_info(self, channel_id, programme_id=None):
@@ -144,15 +150,21 @@ class MagioGo(IPTVClient):
             import time as ptime
             return datetime.datetime(*(ptime.strptime(date_string, format)[0:6]))
 
-    def epg(self, channels, from_date, to_date):
+    def epg(self, channels, from_date, to_date, progress=dummy_progress):
         self._login()
         ret = {}
+
+        progress(0)
 
         from_date = from_date.replace(hour=0, minute=0, second=0, microsecond=0)
         to_date = to_date.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
         now = datetime.datetime.utcnow()
 
-        for n in range(int((to_date - from_date).days)):
+        days = int((to_date - from_date).days)
+
+        for n in range(days):
+            progress((100 // days) * (n + 1))
+
             current_day = from_date + datetime.timedelta(n)
             filter = 'startTime=ge=%sT00:00:00.000Z;startTime=le=%sT00:59:59.999Z' % (
                 current_day.strftime("%Y-%m-%d"), (current_day + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
@@ -202,6 +214,7 @@ class MagioGo(IPTVClient):
                             programme.actors.append(a['fullName'])
 
                         ret[channel].append(programme)
+
         return ret
 
     def archive_days(self):
