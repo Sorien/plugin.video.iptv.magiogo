@@ -61,6 +61,16 @@ class MagioGo(IPTVClient):
                 'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache', 'Referer': 'https://www.magiogo.sk/',
                 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site', 'User-Agent': UA}
 
+    def _get(self, url, params=None, **kwargs):
+        resp = requests.get(url, params=params, **kwargs).json()
+        self._check_response(resp)
+        return resp
+
+    def _post(self, url, data=None, json=None, **kwargs):
+        resp = requests.post(url, data=data, json=json, **kwargs).json()
+        self._check_response(resp)
+        return resp
+
     def _login(self):
         if (self._user_name == '') or (self._password == ''):
             raise UserNotDefinedException
@@ -68,40 +78,34 @@ class MagioGo(IPTVClient):
         self._load_session(self._data)
 
         if not self._data.access_token:
-            resp = requests.post('https://skgo.magio.tv/v2/auth/init',
-                                 params={'dsid': 'Netscape.' + str(int(time.time())) + '.' + str(random.random()),
-                                         'deviceName': 'Netscape',
-                                         'deviceType': 'OTT_WIN',
-                                         'osVersion': '0.0.0',
-                                         'appVersion': '0.0.0',
-                                         'language': 'SK'},
-                                 headers={'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache',
-                                          'Referer': 'https://www.magiogo.sk/', 'User-Agent': UA,
-                                          'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site'}).json()
-            self._check_response(resp)
+            self._post('https://skgo.magio.tv/v2/auth/init',
+                       params={'dsid': 'Netscape.' + str(int(time.time())) + '.' + str(random.random()),
+                               'deviceName': 'Netscape',
+                               'deviceType': 'OTT_WIN',
+                               'osVersion': '0.0.0',
+                               'appVersion': '0.0.0',
+                               'language': 'SK'},
+                       headers={'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache',
+                                'Referer': 'https://www.magiogo.sk/', 'User-Agent': UA,
+                                'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site'})
 
-            resp = requests.post('https://skgo.magio.tv/v2/auth/login',
-                                 json={'loginOrNickname': self._user_name, 'password': self._password},
-                                 headers=self._auth_headers()).json()
-
-            self._check_response(resp)
+            self._post('https://skgo.magio.tv/v2/auth/login',
+                       json={'loginOrNickname': self._user_name, 'password': self._password},
+                       headers=self._auth_headers())
 
         if self._data.refresh_token and self._data.expires_in < int(time.time() * 1000):
-            resp = requests.post('https://skgo.magio.tv/v2/auth/tokens',
-                                 json={'refreshToken': self._data.refresh_token},
-                                 headers=self._auth_headers()).json()
-            self._check_response(resp)
+            self._post('https://skgo.magio.tv/v2/auth/tokens',
+                       json={'refreshToken': self._data.refresh_token},
+                       headers=self._auth_headers())
 
     def channels(self, progress=dummy_progress):
         self._login()
 
         progress(0)
 
-        resp = requests.get('https://skgo.magio.tv/v2/television/channels',
+        resp = self._get('https://skgo.magio.tv/v2/television/channels',
                             params={'list': 'LIVE', 'queryScope': 'LIVE'},
-                            headers=self._auth_headers()).json()
-        self._check_response(resp)
-
+                            headers=self._auth_headers())
         ret = []
         for i in resp['items']:
             i = i['channel']
@@ -119,24 +123,20 @@ class MagioGo(IPTVClient):
 
     def channel_stream_info(self, channel_id, programme_id=None):
         self._login()
-        resp = requests.get('https://skgo.magio.tv/v2/television/stream-url',
-                            params={'service': 'LIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
-                                    'id': channel_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
-                            headers=self._auth_headers()).json()
-        self._check_response(resp)
-
+        resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
+                         params={'service': 'LIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                                 'id': channel_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                         headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
         return si
 
     def programme_stream_info(self, programme_id):
         self._login()
-        resp = requests.get('https://skgo.magio.tv/v2/television/stream-url',
-                            params={'service': 'ARCHIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
-                                    'id': programme_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
-                            headers=self._auth_headers()).json()
-        self._check_response(resp)
-
+        resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
+                         params={'service': 'ARCHIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                                 'id': programme_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                         headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
         return si
@@ -172,10 +172,9 @@ class MagioGo(IPTVClient):
             fetch_more = True
             offset = 0
             while fetch_more:
-                resp = requests.get('https://skgo.magio.tv/v2/television/epg',
-                                    params={'filter': filter, 'limit': '20', 'offset': offset * 20, 'list': 'LIVE'},
-                                    headers=self._auth_headers()).json()
-                self._check_response(resp)
+                resp = self._get('https://skgo.magio.tv/v2/television/epg',
+                                 params={'filter': filter, 'limit': '20', 'offset': offset * 20, 'list': 'LIVE'},
+                                 headers=self._auth_headers())
 
                 fetch_more = len(resp['items']) == 20
                 offset = offset + 1
@@ -231,8 +230,7 @@ class MagioGo(IPTVClient):
             return device
 
         self._login()
-        resp = requests.get('https://skgo.magio.tv/home/listDevices', headers=self._auth_headers()).json()
-        self._check_response(resp)
+        resp = self._get('https://skgo.magio.tv/home/listDevices', headers=self._auth_headers())
 
         devices = [make_device(i, False) for i in resp['items']]
 
@@ -243,5 +241,4 @@ class MagioGo(IPTVClient):
     def disconnect_device(self, device_id):
         # type: (str) -> None
         self._login()
-        resp = requests.get('https://skgo.magio.tv/home/deleteDevice', params={'id': device_id}, headers=self._auth_headers()).json()
-        self._check_response(resp)
+        self._get('https://skgo.magio.tv/home/deleteDevice', params={'id': device_id}, headers=self._auth_headers())
