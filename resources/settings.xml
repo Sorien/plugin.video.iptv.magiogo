@@ -4,7 +4,6 @@
         <setting label="30100" type="lsep"/>
         <setting label="30102" type="text" id="username" default=""/>
         <setting label="30103" type="text" id="password" option="hidden" enable="!eq(-1,)" default=""/>
-        <setting label="30391" type="action" option="close" action="RunScript(special://home/addons/plugin.iptv.magiogo/conf.py)"/>
         <setting type="lsep"/>
         <setting label="30104" type="bool" id="reuse_last_device" default="true"/>
     </category>
