@@ -104,8 +104,8 @@ class MagioGo(IPTVClient):
         progress(0)
 
         resp = self._get('https://skgo.magio.tv/v2/television/channels',
-                            params={'list': 'LIVE', 'queryScope': 'LIVE'},
-                            headers=self._auth_headers())
+                         params={'list': 'LIVE', 'queryScope': 'LIVE'},
+                         headers=self._auth_headers())
         ret = []
         for i in resp['items']:
             i = i['channel']
