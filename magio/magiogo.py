@@ -11,6 +11,8 @@ except:
 from builtins import super
 from iptv.client import IPTVClient, UserNotDefinedException, UA, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress
 
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
+
 
 class MagioGoException(Exception):
     def __init__(self, id, text):
@@ -26,7 +28,7 @@ class MagioGoSessionData:
         self.type = ''
 
 
-class MagioDevice:
+class MagioGoDevice:
     def __init__(self):
         self.id = ''
         self.name = ''
@@ -129,6 +131,7 @@ class MagioGo(IPTVClient):
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
+        si.user_agent = UA
         return si
 
     def programme_stream_info(self, programme_id):
@@ -139,6 +142,7 @@ class MagioGo(IPTVClient):
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
+        si.user_agent = UA
         return si
 
     @staticmethod
@@ -220,9 +224,9 @@ class MagioGo(IPTVClient):
         return 7
 
     def devices(self):
-        # type: () -> List[MagioDevice]
+        # type: () -> List[MagioGoDevice]
         def make_device(i, is_this):
-            device = MagioDevice()
+            device = MagioGoDevice()
             device.id = str(i['id'])
             device.name = i['name']
             device.expiration_time = self._strptime(i['verimatrixExpirationTime'], "%Y-%m-%dT%H:%M:%S.%fZ")
