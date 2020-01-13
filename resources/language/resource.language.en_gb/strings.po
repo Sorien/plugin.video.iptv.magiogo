@@ -3,6 +3,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
 
+msgctxt "#30000"
+msgid "Recordings"
+msgstr "Recordings"
+
+msgctxt "#30001"
+msgid "Delete recording"
+msgstr "Delete recording"
+
+msgctxt "#30002"
+msgid "Are you sure you want to delete recording?"
+msgstr "Are you sure you want to delete recording?"
+
 msgctxt "#30100"
 msgid "Account"
 msgstr "Account"
