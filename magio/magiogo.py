@@ -36,6 +36,12 @@ class MagioGoDevice:
         self.is_this = False
 
 
+class MagioGoRecording:
+    def __init__(self):
+        self.id = ''
+        self.programme = None
+
+
 class MagioGo(IPTVClient):
 
     def __init__(self, storage_dir, user_name, password):
@@ -193,32 +199,36 @@ class MagioGo(IPTVClient):
                         if channel not in ret:
                             ret[channel] = []
 
-                        pi = p['program']
-
-                        programme = Programme()
-                        programme.id = pi['programId']
+                        programme = self._programme_data(p['program'])
                         programme.start_time = self._strptime(p['startTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
                         programme.end_time = self._strptime(p['endTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
-                        programme.title = pi['title']
-                        programme.description = pi['description']
                         programme.duration = p['duration']
                         programme.is_replyable = (programme.start_time > (now - datetime.timedelta(days=7))) and (programme.end_time < now)
-
-                        pv = pi['programValue']
-                        if pv['episodeId'] is not None:
-                            programme.episodeNo = int(pv['episodeId'])
-                        if pv['seasonNumber'] is not None:
-                            programme.seasonNo = int(pv['seasonNumber'])
-                        if len(pi['images']) > 0:
-                            programme.cover = pi['images'][0]
-                        for d in pi['programRole']['directors']:
-                            programme.directors.append(d['fullName'])
-                        for a in pi['programRole']['actors']:
-                            programme.actors.append(a['fullName'])
 
                         ret[channel].append(programme)
 
         return ret
+
+    @staticmethod
+    def _programme_data(pi):
+        programme = Programme()
+        programme.id = pi['programId']
+        programme.title = pi['title']
+        programme.description = pi['description']
+
+        pv = pi['programValue']
+        if pv['episodeId'] is not None:
+            programme.episodeNo = int(pv['episodeId'])
+        if pv['seasonNumber'] is not None:
+            programme.seasonNo = int(pv['seasonNumber'])
+        if len(pi['images']) > 0:
+            programme.cover = pi['images'][0]
+        for d in pi['programRole']['directors']:
+            programme.directors.append(d['fullName'])
+        for a in pi['programRole']['actors']:
+            programme.actors.append(a['fullName'])
+
+        return programme
 
     def archive_days(self):
         return 7
@@ -246,3 +256,39 @@ class MagioGo(IPTVClient):
         # type: (str) -> None
         self._login()
         self._get('https://skgo.magio.tv/home/deleteDevice', params={'id': device_id}, headers=self._auth_headers())
+
+    def recordings(self):
+        # type: () -> List[MagioGoRecording]
+        ret = []
+        self._login()
+        resp = self._get('https://skgo.magio.tv/v2/television/recordings',
+                         params={'platform': 'go', 'planned': 'false'},
+                         headers=self._auth_headers())
+        for i in resp['items']:
+            p = i['schedule']
+
+            recording = MagioGoRecording()
+            recording.id = str(i['id'])
+
+            programme = self._programme_data(p['program'])
+            programme.id = str(p['id'])
+            programme.start_time = self._strptime(p['startTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            programme.end_time = self._strptime(p['endTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            programme.duration = p['duration']
+
+            recording.programme = programme
+
+            ret.append(recording)
+        return ret
+
+    def add_recording(self, schedule_id, channel_id):
+        self._get('https://skgo.magio.tv/television/addProgramRecording',
+                  params={'scheduleId': schedule_id, 'channelID': channel_id, 'type': 'SIMPLE', 'storage': 'go'},
+                  headers=self._auth_headers())
+
+    def delete_recording(self, recording_id):
+        # type: (str) -> None
+        self._login()
+        self._get('https://skgo.magio.tv/television/deleteRecording',
+                  params={'recordingIds': recording_id, 'storage': 'go'},
+                  headers=self._auth_headers())

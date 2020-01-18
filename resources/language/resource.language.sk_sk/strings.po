@@ -3,6 +3,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: sk\n"
 
+msgctxt "#30000"
+msgid "Recordings"
+msgstr "Nahrávky"
+
+msgctxt "#30001"
+msgid "Delete recording"
+msgstr "Odstrániť nahrávku"
+
+msgctxt "#30002"
+msgid "Are you sure you want to delete recording?"
+msgstr "Naozaj chcete odstrániť nahrávku?"
+
 msgctxt "#30100"
 msgid "Account"
 msgstr "Účet"
