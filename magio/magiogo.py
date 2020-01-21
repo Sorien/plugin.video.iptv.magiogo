@@ -9,7 +9,8 @@ except:
     pass
 
 from builtins import super
-from iptv.client import IPTVClient, UserNotDefinedException, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress
+from iptv.client import IPTVClient, UserNotDefinedException, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress, \
+    NetConnectionError
 
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
 
@@ -70,14 +71,20 @@ class MagioGo(IPTVClient):
                 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site', 'User-Agent': UA}
 
     def _get(self, url, params=None, **kwargs):
-        resp = requests.get(url, params=params, **kwargs).json()
-        self._check_response(resp)
-        return resp
+        try:
+            resp = requests.get(url, params=params, **kwargs).json()
+            self._check_response(resp)
+            return resp
+        except requests.exceptions.ConnectionError as err:
+            raise NetConnectionError(err.message)
 
     def _post(self, url, data=None, json=None, **kwargs):
-        resp = requests.post(url, data=data, json=json, **kwargs).json()
-        self._check_response(resp)
-        return resp
+        try:
+            resp = requests.post(url, data=data, json=json, **kwargs).json()
+            self._check_response(resp)
+            return resp
+        except requests.exceptions.ConnectionError as err:
+            raise NetConnectionError(err.message)
 
     def _login(self):
         if (self._user_name == '') or (self._password == ''):

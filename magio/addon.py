@@ -3,7 +3,7 @@ import xbmcgui
 import xbmcplugin
 
 from iptv.addon import IPTVAddon
-from iptv.client import StreamNotResolvedException, UserNotDefinedException, UserInvalidException
+from iptv.client import StreamNotResolvedException, UserNotDefinedException, UserInvalidException, NetConnectionError
 from iptv.logger import log
 from magio.magiogo import MagioGo, MagioGoException
 
@@ -25,10 +25,10 @@ class MagioGoAddon(IPTVAddon):
                                     xbmcgui.ListItem(self.getLocalizedString(30000)), True)
 
     def channels(self):
-        return self.client.channels()
+        return self._call(lambda: self.client.channels())
 
     def epg(self, channels, from_date, to_date):
-        return self.client.epg(channels, from_date, to_date)
+        return self._call(lambda: self.client.epg(channels, from_date, to_date))
 
     def channel_stream_info(self, channel_id):
         return self._call(lambda: self.client.channel_stream_info(channel_id))
@@ -68,12 +68,14 @@ class MagioGoAddon(IPTVAddon):
             xbmcgui.Dialog().ok(self.getAddonInfo('name'), self.getLocalizedString(30502))
         except StreamNotResolvedException:
             xbmcgui.Dialog().ok(self.getAddonInfo('name'), self.getLocalizedString(30504))
+        except NetConnectionError:
+            xbmcgui.Dialog().ok(self.getAddonInfo('name'), self.getLocalizedString(30503))
 
         return result
 
     def recordings_route(self):
         xbmcplugin.setPluginCategory(self._handle, self.getLocalizedString(30000))
-        for rec in self.client.recordings():
+        for rec in self._call(lambda: self.client.recordings()):
             item = xbmcgui.ListItem(rec.programme.title)
             item.setInfo('video', {
                 'title': rec.programme.title,
