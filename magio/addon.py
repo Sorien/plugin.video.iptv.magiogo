@@ -4,7 +4,6 @@ import xbmcplugin
 
 from iptv.addon import IPTVAddon
 from iptv.client import StreamNotResolvedException, UserNotDefinedException, UserInvalidException, NetConnectionError
-from iptv.logger import log
 from magio.magiogo import MagioGo, MagioGoException
 
 
@@ -17,7 +16,8 @@ class MagioGoAddon(IPTVAddon):
     def register_routes(self):
         IPTVAddon.register_routes(self)
         self._router.route('/recordings')(self.recordings_route)
-        self._router.route('/recording/delete/<id>')(self.delete_recording_route)
+        self._router.route('/recording/play/<recording_id>-<programme_id>-<is_series>/')(self.play_recording_route)
+        self._router.route('/recording/delete/<recording_id>')(self.delete_recording_route)
 
     def add_index_directory_items(self):
         IPTVAddon.add_index_directory_items(self)
@@ -57,7 +57,6 @@ class MagioGoAddon(IPTVAddon):
                     device = self._select_device()
 
                 if device != '':
-                    log('disconnecting device: ' + device.id)
                     self.client.disconnect_device(device.id)
                     result = fn()
             else:
@@ -87,11 +86,15 @@ class MagioGoAddon(IPTVAddon):
             item.setProperty('IsPlayable', 'true')
             item.addContextMenuItems([(self.getLocalizedString(30001),
                                        'RunPlugin(%s)' % self.url_for(self.delete_recording_route, rec.id))])
-            xbmcplugin.addDirectoryItem(self._handle, self.url_for(self.play_programme_route, rec.programme.id), item, False)
+            url = self.url_for(self.play_recording_route, rec.id, rec.programme.id, '1' if rec.is_series else '0')
+            xbmcplugin.addDirectoryItem(self._handle, url, item, False)
         xbmcplugin.endOfDirectory(self._handle)
 
-    def delete_recording_route(self, id):
+    def delete_recording_route(self, recording_id):
         dialog = xbmcgui.Dialog()
         if dialog.yesno(self.getAddonInfo('name'), self.getLocalizedString(30002)):
-            self.client.delete_recording(id)
+            self._call(lambda: self.client.delete_recording(recording_id))
             xbmc.executebuiltin("Container.Refresh")
+
+    def play_recording_route(self, recording_id, programme_id, is_series):
+        self._play(self._call(lambda: self.client.recording_stream_info(recording_id, programme_id, is_series == '1')))
