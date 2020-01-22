@@ -27,3 +27,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=140 --statistics
     - name: autopep8
       uses: peter-evans/autopep8@v1.2.0
+      with:
+        args: --recursive --in-place --aggressive --aggressive .
