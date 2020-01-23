@@ -16,7 +16,7 @@ class MagioGoAddon(IPTVAddon):
     def register_routes(self):
         IPTVAddon.register_routes(self)
         self._router.route('/recordings')(self.recordings_route)
-        self._router.route('/recording/play/<recording_id>-<programme_id>-<is_series>/')(self.play_recording_route)
+        self._router.route('/recording/play/<recording_id>/')(self.play_recording_route)
         self._router.route('/recording/delete/<recording_id>')(self.delete_recording_route)
 
     def add_index_directory_items(self):
@@ -86,8 +86,7 @@ class MagioGoAddon(IPTVAddon):
             item.setProperty('IsPlayable', 'true')
             item.addContextMenuItems([(self.getLocalizedString(30001),
                                        'RunPlugin(%s)' % self.url_for(self.delete_recording_route, rec.id))])
-            url = self.url_for(self.play_recording_route, rec.id, rec.programme.id, '1' if rec.is_series else '0')
-            xbmcplugin.addDirectoryItem(self._handle, url, item, False)
+            xbmcplugin.addDirectoryItem(self._handle, self.url_for(self.play_recording_route, rec.id), item, False)
         xbmcplugin.endOfDirectory(self._handle)
 
     def delete_recording_route(self, recording_id):
@@ -96,5 +95,5 @@ class MagioGoAddon(IPTVAddon):
             self._call(lambda: self.client.delete_recording(recording_id))
             xbmc.executebuiltin("Container.Refresh")
 
-    def play_recording_route(self, recording_id, programme_id, is_series):
-        self._play(self._call(lambda: self.client.recording_stream_info(recording_id, programme_id, is_series == '1')))
+    def play_recording_route(self, recording_id):
+        self._play(self._call(lambda: self.client.recording_stream_info(recording_id)))
