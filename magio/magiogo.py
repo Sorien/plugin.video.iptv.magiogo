@@ -76,7 +76,7 @@ class MagioGo(IPTVClient):
             self._check_response(resp)
             return resp
         except requests.exceptions.ConnectionError as err:
-            raise NetConnectionError(err.message)
+            raise NetConnectionError(str(err))
 
     def _post(self, url, data=None, json=None, **kwargs):
         try:
@@ -84,7 +84,7 @@ class MagioGo(IPTVClient):
             self._check_response(resp)
             return resp
         except requests.exceptions.ConnectionError as err:
-            raise NetConnectionError(err.message)
+            raise NetConnectionError(str(err))
 
     def _login(self):
         if (self._user_name == '') or (self._password == ''):
