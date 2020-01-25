@@ -40,7 +40,6 @@ class MagioGoDevice:
 class MagioGoRecording:
     def __init__(self):
         self.id = ''
-        self.is_series = False
         self.programme = None
 
 
@@ -277,7 +276,6 @@ class MagioGo(IPTVClient):
 
             recording = MagioGoRecording()
             recording.id = str(i['id'])
-            recording.is_series = p['program']['programValue']['episodeId'] is not None
 
             programme = self._programme_data(p['program'])
             programme.id = str(p['id'])
@@ -302,11 +300,9 @@ class MagioGo(IPTVClient):
                   params={'recordingIds': recording_id, 'storage': 'go'},
                   headers=self._auth_headers())
 
-    def recording_stream_info(self, recording_id, programme_id, is_series):
-        # type: (str, str, bool) -> StreamInfo
+    def recording_stream_info(self, recording_id):
+        # type: (str) -> StreamInfo
         self._login()
-        if is_series:
-            return self.programme_stream_info(programme_id)
 
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
                          params={'service': 'DVR', 'id': recording_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
