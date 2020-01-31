@@ -9,14 +9,14 @@
     </category>
     <category label="30120">
         <setting label="30121" type="lsep"/>
-        <setting label="30123" type="folder" id="playlist_folder" default=""/>
-        <setting label="30124" type="text" id="playlist_file" default="playlist.m3u"/>
+        <setting label="30123" type="folder" id="playlist_folder" default="special://userdata/addon_data/plugin.iptv.magiogo"/>
+        <setting label="30124" type="text" id="playlist_file" default="magiogo.m3u"/>
     </category>
     <category label="30140">
         <setting label="30141" type="lsep"/>
         <setting label="30142" type="bool" id="epg_generate" default="true"/>
-        <setting label="30143" type="folder" id="epg_folder" default="" enable="eq(-1,true)"/>
-        <setting label="30144" type="text" id="epg_file" default="epg.xml" enable="eq(-2,true)"/>
+        <setting label="30143" type="folder" id="epg_folder" default="special://userdata/addon_data/plugin.iptv.magiogo" enable="eq(-1,true)"/>
+        <setting label="30144" type="text" id="epg_file" default="magiogo.xmltv.xml" enable="eq(-2,true)"/>
         <setting label="30145" type="slider" id="epg_days" default="2" range="1,1,10" option="int" enable="eq(-3,true)"/>
     </category>
 </settings>
