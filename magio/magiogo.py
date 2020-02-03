@@ -9,6 +9,8 @@ except:
     pass
 
 from builtins import super
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 from iptv.client import IPTVClient, UserNotDefinedException, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress, \
     NetConnectionError
 
@@ -60,6 +62,7 @@ class MagioGo(IPTVClient):
                 self._data.type = resp['token']['type']
                 self._store_session(self._data)
         else:
+            self._store_session(MagioGoSessionData())
             error_code = resp['errorCode']
             if error_code == 'INVALID_CREDENTIALS':
                 raise UserInvalidException()
@@ -70,9 +73,16 @@ class MagioGo(IPTVClient):
                 'Origin': 'https://www.magiogo.sk', 'Pragma': 'no-cache', 'Referer': 'https://www.magiogo.sk/',
                 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'cross-site', 'User-Agent': UA}
 
+    @staticmethod
+    def _request():
+        session = requests.Session()
+        session.mount('https://', HTTPAdapter(max_retries=Retry(total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])))
+        return session
+
     def _get(self, url, params=None, **kwargs):
+
         try:
-            resp = requests.get(url, params=params, **kwargs).json()
+            resp = self._request().get(url, params=params, **kwargs).json()
             self._check_response(resp)
             return resp
         except requests.exceptions.ConnectionError as err:
@@ -80,7 +90,7 @@ class MagioGo(IPTVClient):
 
     def _post(self, url, data=None, json=None, **kwargs):
         try:
-            resp = requests.post(url, data=data, json=json, **kwargs).json()
+            resp = self._request().post(url, data=data, json=json, **kwargs).json()
             self._check_response(resp)
             return resp
         except requests.exceptions.ConnectionError as err:
