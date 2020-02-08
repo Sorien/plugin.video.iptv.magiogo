@@ -9,7 +9,7 @@ jobs:
     - run: mkdir -p artifacts/plugin.iptv.magiogo
     - run: cp -r magio/ artifacts/plugin.iptv.magiogo
     - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
-    - run: rm -d artifacts/plugin.iptv.magiogo/iptv/.github
+    - run: rm -r artifacts/plugin.iptv.magiogo/iptv/.github
     - run: rm artifacts/plugin.iptv.magiogo/iptv/.git artifacts/plugin.iptv.magiogo/iptv/.gitignore
     - run: cp -r resources/ artifacts/plugin.iptv.magiogo
     - run: cp LICENSE artifacts/plugin.iptv.magiogo
