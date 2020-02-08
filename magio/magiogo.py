@@ -238,12 +238,21 @@ class MagioGo(IPTVClient):
             programme.episodeNo = int(pv['episodeId'])
         if pv['seasonNumber'] is not None:
             programme.seasonNo = int(pv['seasonNumber'])
-        if len(pi['images']) > 0:
-            programme.cover = pi['images'][0]
+        if pv['creationYear'] is not None:
+            programme.year = int(pv['creationYear'])
+        for i in pi['images']:
+            programme.thumbnail = i
+            break
+        for i in pi['images']:
+            if "_VERT" in i:
+                programme.poster = i
+                break
         for d in pi['programRole']['directors']:
             programme.directors.append(d['fullName'])
         for a in pi['programRole']['actors']:
             programme.actors.append(a['fullName'])
+        for c in pi['programCategory']['subCategories']:
+            programme.genres.append(c['desc'])
 
         return programme
 
