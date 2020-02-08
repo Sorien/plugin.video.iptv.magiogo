@@ -6,6 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - run: mkdir -p plugin.iptv.magiogo
+    - run: ls -la
     - run: cp ..\magio plugin.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
