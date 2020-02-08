@@ -5,9 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: mkdir -p plugin.iptv.magiogo
-    - run: ls -la
-    - run: cp ..\magio plugin.iptv.magiogo
+    - run: mkdir -p /artifacts/plugin.iptv.magiogo
+    - run: cp -r magio/ /artifacts/plugin.iptv.magiogo
+    - run: cp -r iptv/ /artifacts/plugin.iptv.magiogo
+    - run: cp -r resources/ /artifacts/plugin.iptv.magiogo
+    - run: cp LICENCE /artifacts/plugin.iptv.magiogo
+    - run: cp icon.png /artifacts/plugin.iptv.magiogo
+    - run: cp main.py /artifacts/plugin.iptv.magiogo
+    - run: cp service.py /artifacts/plugin.iptv.magiogo
+    - run: cp addon.xml /artifacts/plugin.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
         name: plugin.iptv.magiogo
