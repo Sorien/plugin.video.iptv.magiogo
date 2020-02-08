@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - run: ls -la
     - run: mkdir -p artifacts/plugin.iptv.magiogo
     - run: cp -r magio/ artifacts/plugin.iptv.magiogo
     - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
@@ -18,5 +19,5 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: plugin.iptv.magiogo
-        path: artifacts/plugin.iptv.magiogo
+        path: artifacts
 
