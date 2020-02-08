@@ -14,8 +14,9 @@ jobs:
     - run: cp main.py artifacts/plugin.iptv.magiogo
     - run: cp service.py artifacts/plugin.iptv.magiogo
     - run: cp addon.xml artifacts/plugin.iptv.magiogo
+    - run: cp readme.md artifacts/plugin.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
         name: plugin.iptv.magiogo
-        path: plugin.iptv.magiogo
+        path: artifacts/plugin.iptv.magiogo
 
