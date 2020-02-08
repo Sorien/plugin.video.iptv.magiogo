@@ -9,7 +9,7 @@ jobs:
     - run: cp -r magio/ artifacts/plugin.iptv.magiogo
     - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
     - run: cp -r resources/ artifacts/plugin.iptv.magiogo
-    - run: cp LICENCE artifacts/plugin.iptv.magiogo
+    - run: cp LICENSE artifacts/plugin.iptv.magiogo
     - run: cp icon.png artifacts/plugin.iptv.magiogo
     - run: cp main.py artifacts/plugin.iptv.magiogo
     - run: cp service.py artifacts/plugin.iptv.magiogo
