@@ -5,9 +5,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: mkdir -p test
-    - run: echo hello > test/world.txt
+    - run: git submodule update --init --recursive
+    - run: mkdir -p artifacts/plugin.iptv.magiogo
+    - run: cp -r magio/ artifacts/plugin.iptv.magiogo
+    - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
+    - run: rm -r artifacts/plugin.iptv.magiogo/iptv/.github
+    - run: rm artifacts/plugin.iptv.magiogo/iptv/.git artifacts/plugin.iptv.magiogo/iptv/.gitignore
+    - run: cp -r resources/ artifacts/plugin.iptv.magiogo
+    - run: cp LICENSE artifacts/plugin.iptv.magiogo
+    - run: cp icon.png artifacts/plugin.iptv.magiogo
+    - run: cp main.py artifacts/plugin.iptv.magiogo
+    - run: cp service.py artifacts/plugin.iptv.magiogo
+    - run: cp addon.xml artifacts/plugin.iptv.magiogo
+    - run: cp readme.md artifacts/plugin.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
-        name: test
-        path: test/world.txt
+        name: plugin.iptv.magiogo
+        path: artifacts
+
