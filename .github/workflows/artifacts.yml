@@ -5,9 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: mkdir -p test
-    - run: echo hello > test/world.txt
+    - run: mkdir -p plugin.iptv.magiogo
+    - run: cp ..\magio plugin.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
-        name: test
-        path: test/world.txt
+        name: plugin.iptv.magiogo
+        path: plugin.iptv.magiogo
+
