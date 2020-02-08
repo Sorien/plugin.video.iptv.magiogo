@@ -5,11 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: ls -R
     - run: git submodule update --init --recursive
     - run: mkdir -p artifacts/plugin.iptv.magiogo
     - run: cp -r magio/ artifacts/plugin.iptv.magiogo
     - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
+    - run: rm -d artifacts/plugin.iptv.magiogo/iptv/.github
+    - run: rm artifacts/plugin.iptv.magiogo/iptv/.git artifacts/plugin.iptv.magiogo/iptv/.gitignore
     - run: cp -r resources/ artifacts/plugin.iptv.magiogo
     - run: cp LICENSE artifacts/plugin.iptv.magiogo
     - run: cp icon.png artifacts/plugin.iptv.magiogo
