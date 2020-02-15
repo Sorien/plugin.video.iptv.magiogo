@@ -6,20 +6,19 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - run: git submodule update --init --recursive
-    - run: mkdir -p artifacts/plugin.iptv.magiogo
-    - run: cp -r magio/ artifacts/plugin.iptv.magiogo
-    - run: cp -r iptv/ artifacts/plugin.iptv.magiogo
-    - run: rm -r artifacts/plugin.iptv.magiogo/iptv/.github
-    - run: rm artifacts/plugin.iptv.magiogo/iptv/.git artifacts/plugin.iptv.magiogo/iptv/.gitignore
-    - run: cp -r resources/ artifacts/plugin.iptv.magiogo
-    - run: cp LICENSE artifacts/plugin.iptv.magiogo
-    - run: cp icon.png artifacts/plugin.iptv.magiogo
-    - run: cp main.py artifacts/plugin.iptv.magiogo
-    - run: cp service.py artifacts/plugin.iptv.magiogo
-    - run: cp addon.xml artifacts/plugin.iptv.magiogo
-    - run: cp readme.md artifacts/plugin.iptv.magiogo
+    - run: mkdir -p artifacts/plugin.video.iptv.magiogo
+    - run: cp -r magio/ artifacts/plugin.video.iptv.magiogo
+    - run: cp -r iptv/ artifacts/plugin.video.iptv.magiogo
+    - run: rm -r artifacts/plugin.video.iptv.magiogo/iptv/.github
+    - run: rm artifacts/plugin.video.iptv.magiogo/iptv/.git artifacts/plugin.video.iptv.magiogo/iptv/.gitignore
+    - run: cp -r resources/ artifacts/plugin.video.iptv.magiogo
+    - run: cp LICENSE artifacts/plugin.video.iptv.magiogo
+    - run: cp icon.png artifacts/plugin.video.iptv.magiogo
+    - run: cp main.py artifacts/plugin.video.iptv.magiogo
+    - run: cp service.py artifacts/plugin.video.iptv.magiogo
+    - run: cp addon.xml artifacts/plugin.video.iptv.magiogo
+    - run: cp readme.md artifacts/plugin.video.iptv.magiogo
     - uses: actions/upload-artifact@v1
       with:
-        name: plugin.iptv.magiogo
+        name: plugin.video.iptv.magiogo
         path: artifacts
-
