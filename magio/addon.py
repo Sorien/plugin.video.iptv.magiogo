@@ -4,14 +4,14 @@ import xbmcplugin
 
 from iptv.addon import IPTVAddon
 from iptv.client import StreamNotResolvedException, UserNotDefinedException, UserInvalidException, NetConnectionError
-from magio.magiogo import MagioGo, MagioGoException
+from magio.magiogo import MagioGo, MagioGoException, MagioQuality
 
 
 class MagioGoAddon(IPTVAddon):
 
     def create_client(self):
         profile = xbmc.translatePath(self.getAddonInfo('profile'))
-        return MagioGo(profile, self.getSetting('username'), self.getSetting('password'))
+        return MagioGo(profile, self.getSetting('username'), self.getSetting('password'), MagioQuality.get(int(self.getSetting('quality'))))
 
     def register_routes(self):
         IPTVAddon.register_routes(self)

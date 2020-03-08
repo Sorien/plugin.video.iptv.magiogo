@@ -45,11 +45,23 @@ class MagioGoRecording:
         self.programme = None
 
 
+class MagioQuality:
+    low = 'p1'
+    medium = 'p2'
+    high = 'p3'
+    extra = 'p5'
+
+    @staticmethod
+    def get(index):
+        return {0: MagioQuality.low, 1: MagioQuality.medium, 2: MagioQuality.high, 3: MagioQuality.extra}.get(index, MagioQuality.high)
+
+
 class MagioGo(IPTVClient):
 
-    def __init__(self, storage_dir, user_name, password):
+    def __init__(self, storage_dir, user_name, password, quality=MagioQuality.medium):
         self._user_name = user_name
         self._password = password
+        self._quality = quality
         self._data = MagioGoSessionData()
         super().__init__(storage_dir, '%s.session' % self._user_name)
 
@@ -150,7 +162,7 @@ class MagioGo(IPTVClient):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
                          params={'service': 'LIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
-                                 'id': channel_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                                 'id': channel_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
@@ -161,7 +173,7 @@ class MagioGo(IPTVClient):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
                          params={'service': 'ARCHIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
-                                 'id': programme_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                                 'id': programme_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
@@ -331,7 +343,7 @@ class MagioGo(IPTVClient):
         self._login()
 
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
-                         params={'service': 'DVR', 'id': recording_id, 'prof': 'p3', 'ecid': '', 'drm': 'verimatrix'},
+                         params={'service': 'DVR', 'id': recording_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
                          headers=self._auth_headers())
 
         si = StreamInfo()

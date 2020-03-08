@@ -31,6 +31,26 @@ msgctxt "#30104"
 msgid "When no device is available use oldest"
 msgstr "When no device is available use oldest"
 
+msgctxt "#30105"
+msgid "Quality"
+msgstr "Quality"
+
+msgctxt "#30111"
+msgid "Low"
+msgstr "Low"
+
+msgctxt "#30112"
+msgid "Medium"
+msgstr "Medium"
+
+msgctxt "#30113"
+msgid "High"
+msgstr "High"
+
+msgctxt "#30114"
+msgid "Extra High"
+msgstr "Extra High"
+
 msgctxt "#30120"
 msgid "Playlist"
 msgstr "Playlist"
