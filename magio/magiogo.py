@@ -270,8 +270,9 @@ class MagioGo(IPTVClient):
             programme.directors.append(d['fullName'])
         for a in pi['programRole']['actors']:
             programme.actors.append(a['fullName'])
-        for c in pi['programCategory']['subCategories']:
-            programme.genres.append(c['desc'])
+        if pi['programCategory'] is not None:
+            for c in pi['programCategory']['subCategories']:
+                programme.genres.append(c['desc'])
 
         return programme
 
