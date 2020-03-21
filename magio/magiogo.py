@@ -62,6 +62,7 @@ class MagioGo(IPTVClient):
         self._user_name = user_name
         self._password = password
         self._quality = quality
+        self._device = 'Web Browser'
         self._data = MagioGoSessionData()
         super().__init__(storage_dir, '%s.session' % self._user_name)
 
@@ -117,8 +118,8 @@ class MagioGo(IPTVClient):
         if not self._data.access_token:
             self._post('https://skgo.magio.tv/v2/auth/init',
                        params={'dsid': 'Netscape.' + str(int(time.time())) + '.' + str(random.random()),
-                               'deviceName': 'Netscape',
-                               'deviceType': 'OTT_WIN',
+                               'deviceName': self._device,
+                               'deviceType': 'OTT_ANDROID',
                                'osVersion': '0.0.0',
                                'appVersion': '0.0.0',
                                'language': 'SK'},
@@ -161,7 +162,7 @@ class MagioGo(IPTVClient):
     def channel_stream_info(self, channel_id, programme_id=None):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
-                         params={'service': 'LIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                         params={'service': 'LIVE', 'name': self._device, 'devtype': 'OTT_ANDROID',
                                  'id': channel_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
@@ -172,7 +173,7 @@ class MagioGo(IPTVClient):
     def programme_stream_info(self, programme_id):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
-                         params={'service': 'ARCHIVE', 'name': 'Netscape', 'devtype': 'OTT_ANDROID',
+                         params={'service': 'ARCHIVE', 'name': self._device, 'devtype': 'OTT_ANDROID',
                                  'id': programme_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
