@@ -167,6 +167,7 @@ class MagioGo(IPTVClient):
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
+        si.manifest_type = 'mpd' if si.url.find('mpd') else 'm3u'
         si.user_agent = UA
         return si
 
