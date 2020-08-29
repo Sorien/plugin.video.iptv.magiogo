@@ -232,8 +232,8 @@ class MagioGo(IPTVClient):
                             ret[channel] = []
 
                         programme = self._programme_data(p['program'])
-                        programme.start_time = self._strptime(p['startTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
-                        programme.end_time = self._strptime(p['endTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                        programme.start_time = datetime.datetime.utcfromtimestamp(p['startTimeUTC'] / 1000)
+                        programme.end_time = datetime.datetime.utcfromtimestamp(p['endTimeUTC'] / 1000)
                         programme.duration = p['duration']
                         programme.is_replyable = (programme.start_time > (now - datetime.timedelta(days=7))) and (programme.end_time < now)
 
@@ -321,8 +321,8 @@ class MagioGo(IPTVClient):
 
             programme = self._programme_data(p['program'])
             programme.id = str(p['id'])
-            programme.start_time = self._strptime(p['startTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            programme.end_time = self._strptime(p['endTimeUTC'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            programme.start_time = datetime.datetime.fromtimestamp(p['startTimeUTC'] / 1000)
+            programme.end_time = datetime.datetime.fromtimestamp(p['endTimeUTC'] / 1000)
             programme.duration = p['duration']
 
             recording.programme = programme
