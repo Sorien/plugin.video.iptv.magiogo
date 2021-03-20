@@ -14,7 +14,7 @@ from requests.adapters import HTTPAdapter
 from iptv.client import IPTVClient, UserNotDefinedException, Channel, StreamInfo, Programme, UserInvalidException, dummy_progress, \
     NetConnectionError
 
-UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0'
 
 
 class MagioGoException(Exception):
@@ -119,7 +119,7 @@ class MagioGo(IPTVClient):
             self._post('https://skgo.magio.tv/v2/auth/init',
                        params={'dsid': 'Netscape.' + str(int(time.time())) + '.' + str(random.random()),
                                'deviceName': self._device,
-                               'deviceType': 'OTT_ANDROID',
+                               'deviceType': 'OTT_WIN',
                                'osVersion': '0.0.0',
                                'appVersion': '0.0.0',
                                'language': 'SK'},
@@ -162,8 +162,13 @@ class MagioGo(IPTVClient):
     def channel_stream_info(self, channel_id, programme_id=None):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
-                         params={'service': 'LIVE', 'name': self._device, 'devtype': 'OTT_ANDROID',
-                                 'id': channel_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
+                         params={'service': 'TIMESHIFT',
+                                 'name': self._device,
+                                 'devtype': 'OTT_WIN',
+                                 'id': channel_id,
+                                 'prof': self._quality,
+                                 'ecid': '',
+                                 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
@@ -174,8 +179,13 @@ class MagioGo(IPTVClient):
     def programme_stream_info(self, programme_id):
         self._login()
         resp = self._get('https://skgo.magio.tv/v2/television/stream-url',
-                         params={'service': 'ARCHIVE', 'name': self._device, 'devtype': 'OTT_ANDROID',
-                                 'id': programme_id, 'prof': self._quality, 'ecid': '', 'drm': 'verimatrix'},
+                         params={'service': 'ARCHIVE',
+                                 'name': self._device,
+                                 'devtype': 'OTT_WIN',
+                                 'id': programme_id,
+                                 'prof': self._quality,
+                                 'ecid': '',
+                                 'drm': 'verimatrix'},
                          headers=self._auth_headers())
         si = StreamInfo()
         si.url = resp['url']
