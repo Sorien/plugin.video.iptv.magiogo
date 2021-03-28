@@ -109,11 +109,15 @@ class IPTVAddon(xbmcaddon.Addon):
             xbmcplugin.setResolvedUrl(self._handle, True, item)
 
         elif stream_info.manifest_type == 'm3u':
+            item = xbmcgui.ListItem(path=stream_info.url)
+            item.setProperty('inputstream', 'inputstream.adaptive')
+            item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+
             if stream_info.user_agent:
                 stream_info.headers.update({'User-Agent': stream_info.user_agent})
             if stream_info.headers:
-                stream_info.url += '|%s' % ('&'.join(['%s=%s' % (k, v) for (k, v) in list(stream_info.headers.items())]))
-            item = xbmcgui.ListItem(path=stream_info.url)
+                item.setProperty('inputstream.adaptive.stream_headers', '&'.join(['%s=%s' % (k, v) for (k, v) in
+                                                                                  list(stream_info.headers.items())]))
             xbmcplugin.setResolvedUrl(self._handle, True, item)
             return
         else:
