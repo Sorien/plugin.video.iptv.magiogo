@@ -1,5 +1,5 @@
 import os
-import xbmc
+import xbmcvfs
 
 from datetime import datetime, timedelta
 from iptv.iptvsimple import configure_iptvsimple
@@ -22,11 +22,11 @@ class MagioGoService(IPTVUpdateService):
 
     def playlist_path(self):
         if self.addon.getSetting('playlist_folder'):
-            return os.path.join(xbmc.translatePath(self.addon.getSetting('playlist_folder')), self.addon.getSetting('playlist_file'))
+            return os.path.join(xbmcvfs.translatePath(self.addon.getSetting('playlist_folder')), self.addon.getSetting('playlist_file'))
 
     def epg_path(self):
         if self.addon.getSetting('epg_generate') == 'true' and self.addon.getSetting('epg_folder'):
-            return os.path.join(xbmc.translatePath(self.addon.getSetting('epg_folder')), self.addon.getSetting('epg_file'))
+            return os.path.join(xbmcvfs.translatePath(self.addon.getSetting('epg_folder')), self.addon.getSetting('epg_file'))
 
     def updated_after_settings_changed(self):
         configure_iptvsimple(self.playlist_path(), self.epg_path(), self.addon.getAddonInfo('name'))
